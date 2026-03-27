@@ -1,1186 +1,345 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>泡泡臉八德館｜AI肌膚檢測</title>
-  <meta name="description" content="泡泡臉八德館｜AI肌膚檢測。約30分鐘檢測＋白話解讀，先了解膚況再決定下一步。不硬推，先講清楚。加入官方LINE立即預約或先詢問。" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>膚質診斷諮詢單 - 泡泡臉八德館</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f9f6fc',
+              100: '#f1ebf6',
+              200: '#e1d2eb',
+              300: '#cab0dc',
+              400: '#ae85c7',
+              500: '#9460b1',
+              600: '#814a9a',
+              700: '#6d3c82',
+              800: '#5c356d',
+              900: '#4d2e5a',
+              DEFAULT: '#9A82AA',
+              dark: '#6A4C73',
+              light: '#E6DFED'
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    :root{
-      --bg:#f7f6fb;
-      --text:#1f2430;
-      --muted:#5b6170;
-
-      --brand:#7b5bb3;
-      --brand2:#c7b3ee;
-      --line:#06C755;
-
-      --shadow: 0 10px 28px rgba(31,36,48,.10);
-      --shadow2: 0 14px 40px rgba(31,36,48,.14);
-      --radius: 18px;
-      --max: 1120px;
-
-      --glass-border: 1px solid rgba(123,91,179,.16);
-      --glass-border-2: 1px solid rgba(31,36,48,.08);
-    }
-
-    *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; }
-    body{
-      font-family: "Microsoft JhengHei", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background:
-        radial-gradient(1000px 620px at 18% -10%, rgba(123,91,179,.20), transparent 60%),
-        radial-gradient(900px 560px at 92% 0%, rgba(199,179,238,.22), transparent 55%),
-        radial-gradient(900px 620px at 50% 110%, rgba(123,91,179,.10), transparent 55%),
-        var(--bg);
-      color: var(--text);
-      line-height: 1.65;
-    }
-    img{ max-width:100%; display:block; }
-    a{ color:inherit; }
-    .wrap{ width:min(var(--max), 92vw); margin:0 auto; }
-
-    .topbar{
-      position: sticky;
-      top:0;
-      z-index: 50;
-      background: rgba(255,255,255,.72);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(123,91,179,.14);
-    }
-    .topbar-inner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 12px 0;
-      gap: 12px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width: 180px;
-    }
-    .brand img{
-      height:44px;
-      width:auto;
-      filter: drop-shadow(0 10px 22px rgba(31,36,48,.18));
-    }
-    .nav{
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .nav a{
-      text-decoration:none;
-      color: rgba(31,36,48,.82);
-      font-size: 14px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      transition: .18s ease;
-    }
-    .nav a:hover{ background: rgba(123,91,179,.10); }
-    @media (max-width: 900px){ .nav{ display:none; } }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      border:0;
-      cursor:pointer;
-      text-decoration:none;
-      border-radius: 999px;
-      padding: 14px 18px;
-      font-weight: 1000;
-      transition: .18s ease;
-      white-space:nowrap;
-      user-select:none;
-    }
-    .btn-primary{
-      background: linear-gradient(135deg, rgba(123,91,179,.95), rgba(199,179,238,.95));
-      color: #150b22;
-      box-shadow: var(--shadow);
-    }
-    .btn-primary:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .btn-line{
-      background: var(--line);
-      color:#0b1b10;
-      box-shadow: var(--shadow);
-      font-weight: 1100;
-    }
-    .btn-line:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .ghost{
-      background: rgba(255,255,255,.55);
-      color: var(--text);
-      border: 1px solid rgba(123,91,179,.18);
-      backdrop-filter: blur(10px);
-    }
-    .ghost:hover{ background: rgba(255,255,255,.70); }
-
-    .hero{ padding: 36px 0 12px; }
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 22px;
-      align-items:stretch;
-    }
-    @media (max-width: 900px){
-      .hero-grid{ grid-template-columns: 1fr; }
-    }
-
-    .glass{
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.45));
-      border: var(--glass-border);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .glass::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:
-        radial-gradient(600px 240px at 15% 10%, rgba(123,91,179,.18), transparent 60%),
-        radial-gradient(420px 220px at 90% 0%, rgba(199,179,238,.20), transparent 55%);
-      pointer-events:none;
-      opacity:.85;
-    }
-    .glass > *{ position:relative; }
-
-    .hero-left{
-      padding: 26px;
-      min-height: 480px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap: 18px;
-    }
-
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      font-size: 13px;
-      color: rgba(31,36,48,.72);
-      flex-wrap:wrap;
-    }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: var(--brand2);
-      box-shadow: 0 0 0 6px rgba(199,179,238,.28);
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(123,91,179,.16);
-      color: rgba(31,36,48,.78);
-      font-size: 12px;
-      font-weight: 1000;
-    }
-    h1{
-      margin: 10px 0 10px;
-      font-size: clamp(30px, 3.4vw, 46px);
-      line-height: 1.15;
-      letter-spacing: .2px;
-      color: rgba(31,36,48,.96);
-    }
-    .lead{
-      margin: 0;
-      color: rgba(31,36,48,.78);
-      font-size: 16px;
-      max-width: 62ch;
-    }
-
-    .micro{
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(123,91,179,.16);
-      color: rgba(31,36,48,.78);
-      font-size: 14px;
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    .micro b{ color: rgba(31,36,48,.92); }
-    .micro code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background: rgba(123,91,179,.10);
-      border: 1px solid rgba(123,91,179,.14);
-      padding: 2px 6px;
-      border-radius: 8px;
-      font-weight: 900;
-      color: rgba(31,36,48,.90);
-    }
-
-    .hero-actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top: 10px;
-    }
-
-    .badges{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin-top: 10px;
-    }
-    .badge{
-      font-size: 12px;
-      color: rgba(31,36,48,.78);
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(123,91,179,.16);
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 1000;
-    }
-
-    .stack{ display:grid; gap: 12px; }
-
-    .mini{
-      padding: 14px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.50));
-      border: var(--glass-border-2);
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    .mini strong{ display:block; margin-bottom: 4px; color: rgba(31,36,48,.90); }
-    .mini span{ color: rgba(31,36,48,.72); font-size: 14px; }
-
-    .media{
-      border-radius: var(--radius);
-      overflow:hidden;
-      border: var(--glass-border);
-      background: rgba(255,255,255,.55);
-      box-shadow: var(--shadow);
-      position:relative;
-    }
-    .media::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(180deg, rgba(123,91,179,.06), rgba(255,255,255,0));
-      pointer-events:none;
-    }
-    .media-box{
-      width:100%;
-      aspect-ratio: 4 / 3;
-      overflow:hidden;
-      position:relative;
-    }
-    .media-box img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      object-position: center;
-      transform: scale(1.02);
-    }
-
-    /* ai-service 自動比例模式 */
-    .media-box.service-portrait{
-      aspect-ratio: 9 / 16;
-      background: rgba(255,255,255,.7);
-    }
-    .media-box.service-portrait img{
-      object-fit: contain;
-      object-position: center top;
-      transform: none;
-    }
-
-    .media-box.service-landscape{
-      aspect-ratio: 4 / 3;
-    }
-    .media-box.service-landscape img{
-      object-fit: cover;
-      object-position: center;
-      transform: scale(1.02);
-    }
-
-    section{ padding: 42px 0; }
-    .section-title{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-    .section-title h2{
-      margin:0;
-      font-size: 24px;
-      letter-spacing:.2px;
-      color: rgba(31,36,48,.95);
-    }
-    .section-title p{
-      margin:0;
-      color: rgba(31,36,48,.68);
-      font-size: 14px;
-      max-width: 70ch;
-    }
-
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.48));
-      border: var(--glass-border);
-      border-top: 1px solid rgba(255,255,255,.75);
-      border-left: 1px solid rgba(255,255,255,.55);
-      border-right: 1px solid rgba(31,36,48,.06);
-      border-bottom: 1px solid rgba(31,36,48,.08);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-    .card h3{ margin: 0 0 8px; font-size: 18px; color: rgba(31,36,48,.92); }
-    .card p{ margin:0; color: rgba(31,36,48,.70); font-size: 14px; }
-
-    .split{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items:stretch;
-    }
-    @media (max-width: 900px){ .split{ grid-template-columns: 1fr; } }
-
-    .steps{ display:grid; gap: 12px; }
-    .step{
-      display:flex;
-      gap: 12px;
-      padding: 14px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.48));
-      border: var(--glass-border-2);
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    .num{
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: rgba(123,91,179,.14);
-      border: 1px solid rgba(123,91,179,.22);
-      font-weight: 1100;
-      color: rgba(31,36,48,.90);
-      flex: 0 0 auto;
-      user-select:none;
-    }
-    .step strong{ display:block; margin-bottom: 4px; color: rgba(31,36,48,.92); }
-    .step span{ color: rgba(31,36,48,.72); font-size: 14px; }
-
-    .chips{ display:flex; flex-wrap:wrap; gap: 8px; margin-top: 10px; }
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(123,91,179,.18);
-      color: rgba(31,36,48,.80);
-      font-size: 13px;
-      font-weight: 1100;
-      cursor:pointer;
-      transition: .15s ease;
-      user-select:none;
-    }
-    .chip:hover{ transform: translateY(-1px); }
-    .chip.active{
-      background: rgba(123,91,179,.12);
-      border-color: rgba(123,91,179,.32);
-    }
-    .chip i{
-      width:8px; height:8px; border-radius:999px;
-      background: rgba(123,91,179,.55);
-      display:inline-block;
-      box-shadow: 0 0 0 5px rgba(199,179,238,.26);
-    }
-
-    .panel{
-      padding: 18px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.50));
-      border: var(--glass-border);
-      box-shadow: var(--shadow);
-    }
-    .panel-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap:wrap;
-      margin-bottom: 12px;
-    }
-    .panel-head h3{ margin:0; font-size: 18px; color: rgba(31,36,48,.92); }
-    .panel-head p{ margin:0; color: rgba(31,36,48,.68); font-size: 13px; max-width: 70ch; }
-
-    .knowledge-box{
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.62);
-      border: 1px solid rgba(123,91,179,.16);
-      box-shadow: 0 10px 24px rgba(31,36,48,.06);
-    }
-    .knowledge-box h4{
-      margin:0 0 8px;
-      font-size: 16px;
-      color: rgba(31,36,48,.92);
-    }
-    .knowledge-box p{
-      margin:0;
-      color: rgba(31,36,48,.74);
-      font-size: 14px;
-    }
-
-    .img-caption{
-      margin-top: 10px;
-      color: rgba(31,36,48,.70);
-      font-size: 14px;
-    }
-
-    .faq{ display:grid; gap: 10px; }
-    details{
-      background: linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.50));
-      border: var(--glass-border-2);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    summary{
-      cursor:pointer;
-      font-weight: 1100;
-      list-style:none;
-      outline:none;
-      color: rgba(31,36,48,.92);
-    }
-    summary::-webkit-details-marker{ display:none; }
-    details p{ margin: 10px 0 0; color: rgba(31,36,48,.72); font-size: 14px; }
-
-    .callout{
-      padding: 14px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.50));
-      border: 1px solid rgba(123,91,179,.18);
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-      color: rgba(31,36,48,.78);
-      font-size: 14px;
-    }
-    .callout b{ color: rgba(31,36,48,.92); }
-
-    .contact-card{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 14px;
-    }
-    @media (max-width: 900px){ .contact-card{ grid-template-columns: 1fr; } }
-    .contact-left, .contact-right{
-      padding: 18px;
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.50));
-      border: var(--glass-border);
-      box-shadow: var(--shadow);
-    }
-    .kv{
-      display:grid;
-      gap: 8px;
-      margin: 12px 0 0;
-      color: rgba(31,36,48,.78);
-      font-size: 14px;
-    }
-    .kv div{ display:flex; gap: 10px; align-items:flex-start; }
-    .kv i{ opacity:.85; font-style: normal; }
-    .hint{ color: rgba(31,36,48,.64); font-size: 13px; margin:10px 0 0; }
-
-    .social{
-      display:grid;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .social a{
-      text-decoration:none;
-    }
-    .btn-fb{
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(66, 103, 178, .28);
-      color: rgba(31,36,48,.92);
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    .btn-fb:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .btn-ig{
-      background: rgba(255,255,255,.60);
-      border: 1px solid rgba(193, 53, 132, .22);
-      color: rgba(31,36,48,.92);
-      box-shadow: 0 10px 26px rgba(31,36,48,.08);
-    }
-    .btn-ig:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-
-    .float-line{
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      z-index: 60;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      align-items:flex-end;
-    }
-    .float-pill{
-      display:inline-flex;
-      gap: 10px;
-      align-items:center;
-      padding: 12px 14px;
-      border-radius: 999px;
-      background: rgba(6,199,85,.96);
-      color:#0b1b10;
-      font-weight: 1100;
-      text-decoration:none;
-      box-shadow: 0 14px 34px rgba(31,36,48,.20);
-      border: 1px solid rgba(255,255,255,.60);
-    }
-    .float-pill small{
-      display:block;
-      font-weight: 900;
-      opacity:.85;
-      font-size: 12px;
-      margin-top: 2px;
-    }
-
-    footer{
-      padding: 28px 0 56px;
-      border-top: 1px solid rgba(123,91,179,.14);
-      color: rgba(31,36,48,.62);
-      font-size: 13px;
-    }
-    .muted{ color: rgba(31,36,48,.66); }
-
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; scroll-behavior:auto !important; }
+    body {
+      background-color: #f7f5f9;
+      background-image: radial-gradient(#e1d2eb 0.5px, transparent 0.5px);
+      background-size: 20px 20px;
+    }
+    
+    .radio-custom:checked + label {
+      border-color: #9A82AA;
+      background-color: #f9f6fc;
+    }
+    .radio-custom:checked + label .radio-circle {
+      border-color: #9A82AA;
+    }
+    .radio-custom:checked + label .radio-circle::after {
+      transform: scale(1);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
+<body class="antialiased text-gray-800">
 
-<body>
+  <div id="root"></div>
 
-  <script>
-    const CONTENT = {
-      brandName: "泡泡臉八德館",
-      pageTitle: "AI肌膚檢測",
-      lineJoinShort: "https://lin.ee/JIvLjaD",
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-      heroTitle: "粉刺、毛孔、膚況不穩？先做一次 AI 肌膚檢測",
-      heroDesc: "很多人保養很努力卻一直沒感覺，原因常常不是不夠勤勞，而是方向一開始就錯了。AI 檢測＋白話解讀，讓你搞懂自己皮膚正在發生什麼，很多人當下第一句話就是：「原來是這樣。」",
-
-      lineOaId: "@191hkpbi",
-      lineMsgBook: "我要預約AI肌膚檢測",
-      lineMsgAsk: "我想先詢問我的膚況，想請你幫我看一下。",
-
-      phone: "0986239526",
-      address: "桃園市八德區廣興五街53號",
-      mapQuery: "桃園市八德區廣興五街53號",
-
-      facebookUrl: "https://www.facebook.com/share/1EQgh1Rr4Y/",
-      instagramUrl: "https://www.instagram.com/bubblan_53?igsh=OWY0dndxbHhseW11",
-
-      imgLogo: "images/logo.png",
-      imgStore: "images/store.jpg",
-      imgOwner: "images/owner.jpg",
-      imgDevice: "images/ai-device.jpg",
-      imgService: "images/ai-service.jpg",
-
-      checkupTime: "約 30 分鐘（檢測＋解讀）",
-      acneCareTime: "粉刺管理護理約 90 分鐘",
-
-      skinItems: [
-        { key: "水分", label: "水分" },
-        { key: "油脂", label: "油脂" },
-        { key: "毛孔", label: "毛孔" },
-        { key: "黑頭", label: "黑頭" },
-        { key: "痘痘", label: "痘痘" },
-        { key: "屏障", label: "屏障" },
-        { key: "淺層色素", label: "淺層色素" },
-        { key: "皺紋", label: "皺紋" }
-      ],
-
-      knowledge: {
-        "水分": "水分充足時，肌膚會看起來比較飽滿、細緻，也比較不容易乾燥或緊繃。若水分不足，常見狀況是乾燥、脫屑或保養吸收變差。",
-        "油脂": "油脂像皮膚表面的一層天然保護膜，可以幫助鎖住水分。油脂過多容易出現油光、粉刺；過少則可能乾燥、敏感。",
-        "毛孔": "毛孔是皮膚排出油脂與汗液的通道。當油脂分泌過多或膠原蛋白流失時，毛孔就會看起來比較明顯。",
-        "黑頭": "黑頭是毛孔裡的油脂與老廢角質接觸空氣氧化形成的黑點。常見在鼻子、額頭與下巴等油脂分泌較旺盛的部位。",
-        "痘痘": "痘痘通常是毛孔堵塞後，再加上細菌感染造成的發炎反應。若處理不當，可能留下痘印或痘疤。",
-        "屏障": "皮膚屏障是保護肌膚的第一道防線，負責鎖水與抵禦外界刺激。當屏障受損時，肌膚容易乾燥、泛紅或變得敏感。",
-        "淺層色素": "淺層色素常見為曬斑、痘印或色斑。多半與紫外線、發炎或作息不規律有關。",
-        "皺紋": "皺紋主要與膠原蛋白流失和皮膚彈性下降有關。一開始可能只是細紋，時間久了可能變成較深的紋路。"
-      }
+    const FORM_ACTION = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeXtuhIRvnlPa35jsBnJ425ta3LNwMCmmDCels8QWtArhqdWQ/formResponse";
+    
+    const FIELDS = {
+      name: "entry.201452823",
+      gender: "entry.2070932752",
+      age: "entry.1844069388",
+      job: "entry.1141045621",
+      q1: "entry.1941121610",
+      q2: "entry.818827577",
+      q3: "entry.827274494",
+      q4: "entry.568787330",
+      q5: "entry.74609922",
+      q6: "entry.682606750",
+      q7: "entry.2111519056",
+      q8: "entry.2011751690",
+      q9: "entry.1475037026",
     };
-  </script>
 
-  <div class="float-line">
-    <a class="float-pill" id="floatLineBtn" href="#" target="_blank" rel="noopener">
-      <span>LINE 立即預約<br><small>點一下就能聊</small></span>
-    </a>
-  </div>
+    const RADIO_OPTIONS = {
+      q1: ["1細小且不明顯", "2極為細小", "3T字粗大/兩頰細", "4粗大且明顯", "5視原膚質而定"],
+      q2: ["1肌理平順細緻", "2觸摸明顯粗糙", "3肌膚觸感較厚", "4局部油膩/局部乾", "5皮膚看起來較薄"],
+      q3: ["1不油不膩、平衡", "2全臉幾乎無油", "3全臉泛油光", "4油脂集中於T字", "5皮脂膜通常受損"],
+      q4: ["1水分充盈濕潤", "2感到緊繃、缺水", "3常伴隨內乾外油", "4兩頰緊繃脫皮", "5常感發癢或刺痛"],
+      q5: ["1充滿健康光澤", "2暗沈無光澤", "3油膩、毛孔阻塞", "4T區油光/U區乾", "5微血管明顯可見"],
+      q6: ["1富有彈性", "2缺乏彈性", "3彈性尚可", "4局部表現不一", "5彈性可能較差"],
+      q7: ["1幾乎無症狀", "2易長皺紋、斑點", "3易長痘痘、粉刺", "4T區痘/U區緊繃", "5易發疹子、泛紅"],
+      q8: ["1耐受度高、穩定", "2易因低溫脫皮", "3對溫濕度反應敏感", "4受環境影響波動大", "5耐受值低、易發炎"],
+      q9: ["1持久且自然", "2易浮粉、不吃妝", "3容易上妝也易脫妝", "4局部脫妝、局部乾", "5易因化妝品不適"],
+    };
 
-  <div class="topbar">
-    <div class="wrap topbar-inner">
-      <div class="brand">
-        <img id="logoImg" alt="logo" loading="lazy" />
+    const QUESTIONS_TITLES = {
+      q1: "1. 毛孔狀態",
+      q2: "2. 肌理與觸感",
+      q3: "3. 油脂分泌",
+      q4: "4. 水分/感覺",
+      q5: "5. 外觀特徵",
+      q6: "6. 彈性表現",
+      q7: "7. 常見問題",
+      q8: "8. 對外界反應",
+      q9: "9. 妝效表現",
+    };
+
+    const Card = ({ children, className = "" }) => (
+      <div className={`bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(154,130,170,0.15)] p-6 mb-6 border border-brand-100 ${className}`}>
+        {children}
       </div>
+    );
 
-      <nav class="nav">
-        <a href="#device">AI檢測</a>
-        <a href="#results">8項指標</a>
-        <a href="#solutions">改善路徑</a>
-        <a href="#owner">主理人</a>
-        <a href="#faq">FAQ</a>
-        <a class="btn btn-primary" href="#contact">立即預約</a>
-      </nav>
-
-      <a class="btn btn-line" id="topBookBtn" href="#" target="_blank" rel="noopener">加入LINE｜我要預約AI檢測</a>
-    </div>
-  </div>
-
-  <header class="hero">
-    <div class="wrap hero-grid">
-      <div class="glass hero-left">
-        <div>
-          <div class="kicker">
-            <span class="dot"></span>
-            <span>八德在地｜肌膚管理 × AI檢測</span>
-            <span class="pill">以鮑曼博士 16 型邏輯整理</span>
-          </div>
-
-          <h1 id="heroTitle"></h1>
-          <p class="lead" id="heroDesc"></p>
-
-          <div class="micro">
-            <b>你不用懂專業</b>，你只要加入 LINE，直接傳：<code>我要預約AI肌膚檢測</code><br/>
-            我們會協助你安排時間。<span class="muted" id="timeText"></span>
-          </div>
-
-          <div class="hero-actions">
-            <a class="btn btn-line" id="heroBookBtn" href="#" target="_blank" rel="noopener">加入LINE｜我要預約AI檢測</a>
-            <a class="btn ghost" href="#results">我想先看看檢測內容</a>
-          </div>
-
-          <div class="badges">
-            <span class="badge" id="badgeTime"></span>
-            <span class="badge">✔ 先解釋膚況，不硬推</span>
-            <span class="badge">✔ 只挑最有感的 8 項，好懂好決策</span>
-          </div>
-        </div>
-
-        <div class="callout">
-          <b>我們很理解很多人怕被推銷。</b><br/>
-          檢測後會先把膚況講清楚，是否要做護理或保養，都由你決定。
-        </div>
+    const TextInput = ({ label, name, required, placeholder, type = "text" }) => (
+      <div className="mb-6">
+        <label className="block text-brand-dark font-medium mb-2 flex items-center">
+          {label} {required && <span className="text-red-400 ml-1">*</span>}
+        </label>
+        <input 
+          type={type}
+          name={name}
+          required={required}
+          placeholder={placeholder}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent transition-all duration-200"
+        />
       </div>
+    );
 
-      <div class="stack">
-        <div class="media" title="店內環境">
-          <div class="media-box">
-            <img id="storeImg" alt="店內環境" loading="lazy" />
-          </div>
-        </div>
-
-        <div class="media" title="AI肌膚檢測儀">
-          <div class="media-box">
-            <img id="serviceImg" alt="AI肌膚檢測儀" loading="lazy" />
-          </div>
-        </div>
-
-        <div class="mini">
-          <strong>地點</strong>
-          <span id="miniAddress"></span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <section id="device">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>AI 肌膚檢測（約 30 分鐘）</h2>
-          <p>檢測只是第一步；重點是「解讀」。我們用白話把你的膚況講清楚，再用鮑曼博士 16 型的邏輯整理方向。</p>
-        </div>
-      </div>
-
-      <div class="split">
-        <div class="card">
-          <h3>你最在意的問題，通常落在這 8 項</h3>
-          <p class="muted">完整報告涵蓋更多指標，但你不需要背名詞；你只需要知道：你現在的膚況重點是什麼、下一步該怎麼做。</p>
-
-          <div class="steps" style="margin-top:12px">
-            <div class="step">
-              <div class="num">1</div>
-              <div>
-                <strong>檢測分析</strong>
-                <span>快速掌握目前膚況，找出你最該先處理的重點。</span>
+    const RadioGroup = ({ title, name, options }) => (
+      <Card className="hover:shadow-[0_8px_30px_-4px_rgba(154,130,170,0.2)] transition-shadow duration-300">
+        <h3 className="text-lg font-bold text-brand-dark mb-4 flex items-center">
+          <i className="ph-fill ph-sparkle text-brand-DEFAULT mr-2"></i>
+          {title} <span className="text-red-400 ml-1 text-sm">*</span>
+        </h3>
+        <div className="space-y-3">
+          {options.map((opt, idx) => {
+            const id = `${name}-${idx}`;
+            return (
+              <div key={idx} className="relative">
+                <input 
+                  type="radio" 
+                  id={id} 
+                  name={name} 
+                  value={opt} 
+                  required 
+                  className="radio-custom absolute opacity-0 w-full h-full cursor-pointer z-10"
+                />
+                <label 
+                  htmlFor={id} 
+                  className="flex items-center p-4 border border-gray-100 rounded-xl cursor-pointer transition-all duration-200 hover:bg-brand-50"
+                >
+                  <div className="radio-circle w-5 h-5 rounded-full border-2 border-gray-300 mr-3 flex items-center justify-center relative">
+                    <div className="w-2.5 h-2.5 rounded-full bg-brand-DEFAULT scale-0 transition-transform duration-200 after-element absolute"></div>
+                  </div>
+                  <span className="text-gray-700 font-medium">{opt}</span>
+                </label>
               </div>
-            </div>
-            <div class="step">
-              <div class="num">2</div>
-              <div>
-                <strong>白話解讀</strong>
-                <span>你只會問「這是什麼意思？」我們就把它講到你聽得懂。</span>
-              </div>
-            </div>
-            <div class="step">
-              <div class="num">3</div>
-              <div>
-                <strong>下一步方向（可自由選擇）</strong>
-                <span>你不需要當下決定。我們先講清楚，你再決定要不要做任何安排。</span>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-line" id="deviceBookBtn" href="#" target="_blank" rel="noopener">加入LINE｜我要預約AI檢測</a>
-            <a class="btn ghost" href="#faq">我想先看常見問題</a>
-          </div>
+            );
+          })}
         </div>
+      </Card>
+    );
 
-        <div class="media">
-          <div class="media-box" id="deviceImgBox">
-            <img id="deviceImg" alt="AI肌膚檢測服務情境" loading="lazy" />
-          </div>
-        </div>
-      </div>
+    const App = () => {
+      const [isSubmitted, setIsSubmitted] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
 
-      <div style="margin-top:14px" class="callout">
-        <b>定位很簡單：</b>先分析、先講清楚、再決定。<br/>
-        你可以只做檢測了解膚況，也可以再評估要不要做護理或居家保養。
-      </div>
-    </div>
-  </section>
-
-  <section id="results">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>前台只放最有感的 8 項（好懂、好決策）</h2>
-          <p>點選檢測項目即可切換</p>
-        </div>
-      </div>
-
-      <div class="split">
-        <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h3>點選檢測項目</h3>
-            </div>
-          </div>
-
-          <div class="chips" id="skinChips"></div>
-
-          <div class="knowledge-box">
-            <h4 id="knowledgeTitle">肌膚小知識｜水分</h4>
-            <p id="knowledgeText"></p>
-          </div>
-
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-line" id="resultsBookBtn" href="#" target="_blank" rel="noopener">加入LINE｜我要預約AI檢測</a>
-            <a class="btn ghost" href="#solutions">我想看改善路徑</a>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h3 id="currentMetricTitle">水分</h3>
-              <p id="currentMetricHint">（真人測試圖）</p>
-            </div>
-          </div>
-
-          <div class="media">
-            <div class="media-box">
-              <img id="metricImg" alt="檢測示意圖" loading="lazy" />
-            </div>
-          </div>
-
-          <div class="img-caption" id="metricCaption">
-            透過真人測試圖，可以更清楚了解目前肌膚狀況，幫助理解檢測結果與後續保養方向。
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="solutions">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>依檢測結果，提供兩條改善路徑</h2>
-          <p>你可以只做檢測了解膚況，也可以依需求選擇店內護膚或居家保養方向。是否要做，由你決定。</p>
-        </div>
-      </div>
-
-      <div class="split">
-        <div class="card">
-          <h3>店內護膚管理（3 大方向）</h3>
-          <p class="muted">我們不在網頁上列「完整課程表」，避免你還沒了解膚況就被迫選擇。到店後會依檢測結果建議方向。</p>
-
-          <div class="steps" style="margin-top:12px">
-            <div class="step">
-              <div class="num">A</div>
-              <div>
-                <strong>粉刺與毛孔管理</strong>
-                <span>黑頭粉刺 / 毛孔堵塞 / 油脂分泌不平衡。<br/><b>（粉刺管理護理約 90 分鐘）</b></span>
-              </div>
-            </div>
-            <div class="step">
-              <div class="num">B</div>
-              <div>
-                <strong>基礎保濕與膚質調理</strong>
-                <span>乾燥緊繃 / 保養吸收差 / 膚質粗糙，先把底子打穩。</span>
-              </div>
-            </div>
-            <div class="step">
-              <div class="num">C</div>
-              <div>
-                <strong>修護與膠原管理</strong>
-                <span>膚況疲勞 / 細紋 / 想要更穩更亮更有彈性。</span>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-line" id="solutionsAskBtn" href="#" target="_blank" rel="noopener">加入LINE｜我想先問一下</a>
-            <a class="btn ghost" href="#owner">我想看主理人介紹</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>居家保養（方向建議）</h3>
-          <p>很多人最怕被推產品，所以我們先說清楚：<b>居家保養是做對關鍵步驟</b>，不是買越多越好。</p>
-
-          <div class="steps" style="margin-top:12px">
-            <div class="step">
-              <div class="num">1</div>
-              <div>
-                <strong>把關鍵步驟做對</strong>
-                <span>清潔 / 保濕 / 修護 / 防曬，依膚況調整比例與順序。</span>
-              </div>
-            </div>
-            <div class="step">
-              <div class="num">2</div>
-              <div>
-                <strong>少而精</strong>
-                <span>依檢測結果給你「最需要先做的 1–2 件事」，不要讓保養變成壓力。</span>
-              </div>
-            </div>
-            <div class="step">
-              <div class="num">3</div>
-              <div>
-                <strong>需要才提供產品</strong>
-                <span>如果你需要，我們也有代理產品可協助，但<b>不是必買</b>。</span>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:14px" class="callout">
-            <b>你可以只做檢測</b>，拿到方向後回家自己執行也可以。<br/>
-            我們做的是「讓你弄懂」，不是「逼你買」。
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="owner">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>主理人｜泡泡臉八德館</h2>
-          <p>你要的不是聽一堆專業名詞，而是有人把膚況講清楚、做起來安心。</p>
-        </div>
-      </div>
-
-      <div class="split">
-        <div class="media">
-          <div class="media-box">
-            <img id="ownerImg" alt="泡泡臉八德館 主理人" loading="lazy" />
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>信任感來自：有依據＋不施壓</h3>
-          <p>我們以 AI 檢測結果為依據，並用鮑曼博士 16 型膚質邏輯整理方向。很多人做完檢測說「原來是這樣」，因為終於有人把膚況講清楚。</p>
-
-          <div class="chips" style="margin-top:12px">
-            <span class="chip" style="cursor:default"><i></i>國家證照／肌膚管理認證</span>
-            <span class="chip" style="cursor:default"><i></i>檢測結果為依據</span>
-            <span class="chip" style="cursor:default"><i></i>不硬推・先講清楚</span>
-          </div>
-
-          <div class="callout" style="margin-top:12px">
-            <b>我們很理解很多人怕被推銷。</b><br/>
-            檢測後會先解釋膚況與改善方向，是否要做護理或保養，都由你決定。
-          </div>
-
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-line" id="ownerAskBtn" href="#" target="_blank" rel="noopener">加入LINE｜我想先問一下</a>
-            <a class="btn ghost" href="#contact">我想直接看聯絡方式</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>FAQ｜你可能會想問</h2>
-          <p>我們把最常見的疑慮先講清楚，讓你更安心預約。</p>
-        </div>
-      </div>
-
-      <div class="faq">
-        <details>
-          <summary>AI 肌膚檢測需要多久？</summary>
-          <p>約 30 分鐘，包含檢測與白話解讀，讓你知道目前膚況重點與下一步方向。</p>
-        </details>
-
-        <details>
-          <summary>檢測後一定要做護膚課程或買產品嗎？</summary>
-          <p>不一定。你可以只做檢測了解膚況，我們會先把膚況講清楚，你再決定要不要安排任何下一步。</p>
-        </details>
-
-        <details>
-          <summary>鮑曼博士 16 型是什麼？我需要懂嗎？</summary>
-          <p>你不需要懂。你只要知道：我們會用這套邏輯把結果整理成你聽得懂的「改善方向」，避免越保養越亂。</p>
-        </details>
-
-        <details>
-          <summary>AI 肌膚檢測費用怎麼算？</summary>
-          <p>
-            原價為 <b>NT$588 / 人</b>。<br/>
-            <b>三人同行一人免費</b>（等於兩人付費、第三人免費）。<br/>
-            若檢測後當日有安排店內護膚課程，檢測可享 <b>NT$100</b> 的優惠方式（可在 LINE 由我們協助說明最適合你的方案）。
-          </p>
-        </details>
-
-        <details>
-          <summary>粉刺管理大概多久？會不會很痛？</summary>
-          <p>粉刺管理護理約 90 分鐘，會依膚況安排清潔、粉刺處理與修護。疼痛感因人而異，我們會以「能接受、能持續」為原則調整方式。</p>
-        </details>
-
-        <details>
-          <summary>我想預約，要怎麼說最快？</summary>
-          <p>
-            加入 LINE 後直接傳：<b>「我要預約AI肌膚檢測」</b><br/>
-            再補一句：<b>希望時段：＿＿＿＿（舉例 星期一下午2點）</b>，我們就能很快幫你安排。
-          </p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <div class="wrap">
-      <div class="section-title">
-        <div>
-          <h2>立即預約</h2>
-          <p>最快方式：加入官方 LINE。你也可以直接來電，或先追蹤社群了解我們。</p>
-        </div>
-      </div>
-
-      <div class="contact-card">
-        <div class="contact-left">
-          <h3 style="margin:0 0 6px;">泡泡臉八德館｜聯絡資訊</h3>
-
-          <div class="kv">
-            <div><i>📍</i><span id="addrText"></span></div>
-            <div><i>☎️</i><span id="phoneText"></span></div>
-            <div><i>💬</i><span>官方 LINE：點按鈕加入（詳細資訊於官方LINE內）</span></div>
-          </div>
-
-          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn btn-line" id="contactBookBtn" href="#" target="_blank" rel="noopener">加入LINE｜我要預約AI檢測</a>
-            <a class="btn ghost" id="mapBtn" href="#" target="_blank" rel="noopener">打開地圖導航</a>
-          </div>
-
-          <p class="hint">＊你也可以先「詢問」再預約：頁面中的「我想先問一下」就是給你用的。</p>
-        </div>
-
-        <div class="contact-right">
-          <h3 style="margin:0 0 8px;">追蹤泡泡臉八德館</h3>
-          <p class="muted" style="margin:0 0 10px;">
-            想先看看我們平常的護膚分享與店內內容嗎？歡迎追蹤我們的社群（你會更安心，也更了解我們的風格）。
-          </p>
-
-          <div class="social">
-            <a class="btn btn-fb" id="fbBtn" href="#" target="_blank" rel="noopener">追蹤 Facebook 粉絲專頁</a>
-            <a class="btn btn-ig" id="igBtn" href="#" target="_blank" rel="noopener">追蹤 Instagram（@bubblan_53）</a>
-          </div>
-
-          <div class="callout" style="margin-top:12px;">
-            <b>看完再來問也可以。</b><br/>
-            你若只是想先了解膚況方向，點「我想先問一下」就好，我們會先解釋，不會逼你買。
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="wrap">
-      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-        <div>
-          <b id="footerBrand"></b>
-          <div class="muted" style="margin-top:6px;" id="footerAddr"></div>
-          <div class="muted" id="footerPhone"></div>
-        </div>
-        <div class="muted">
-          © <span id="year"></span> BubbleFace. All rights reserved.
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    const setText = (id, text) => { const el=document.getElementById(id); if(el) el.textContent=text; };
-    const setImg  = (id, src)  => { const el=document.getElementById(id); if(el) el.src=src; };
-
-    function lineOaMessageLink(oaId, message){
-      return `https://line.me/R/oaMessage/${encodeURIComponent(oaId)}/?${encodeURIComponent(message)}`;
-    }
-    const LINK_BOOK_PREFILL = lineOaMessageLink(CONTENT.lineOaId, CONTENT.lineMsgBook);
-    const LINK_ASK_PREFILL  = lineOaMessageLink(CONTENT.lineOaId, CONTENT.lineMsgAsk);
-
-    const isMobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
-    const LINK_BOOK_FINAL = isMobile ? LINK_BOOK_PREFILL : CONTENT.lineJoinShort;
-    const LINK_ASK_FINAL  = isMobile ? LINK_ASK_PREFILL  : CONTENT.lineJoinShort;
-
-    document.title = `${CONTENT.brandName}｜${CONTENT.pageTitle}`;
-    setText("heroTitle", CONTENT.heroTitle);
-    setText("heroDesc", CONTENT.heroDesc);
-    setText("miniAddress", CONTENT.address);
-    setText("addrText", CONTENT.address);
-    setText("phoneText", CONTENT.phone);
-
-    setImg("logoImg", CONTENT.imgLogo);
-    setImg("storeImg", CONTENT.imgStore);
-    setImg("serviceImg", CONTENT.imgDevice);
-    setImg("ownerImg", CONTENT.imgOwner);
-    setImg("deviceImg", CONTENT.imgService);
-
-    setText("footerBrand", CONTENT.brandName);
-    setText("footerAddr", CONTENT.address);
-    setText("footerPhone", `預約專線：${CONTENT.phone}`);
-    setText("year", String(new Date().getFullYear()));
-
-    setText("timeText", `（${CONTENT.checkupTime}）`);
-    setText("badgeTime", `✔ ${CONTENT.checkupTime}`);
-
-    ["floatLineBtn","topBookBtn","heroBookBtn","deviceBookBtn","resultsBookBtn","contactBookBtn"]
-      .forEach(id => { const el=document.getElementById(id); if(el) el.href = LINK_BOOK_FINAL; });
-
-    ["ownerAskBtn","solutionsAskBtn"]
-      .forEach(id => { const el=document.getElementById(id); if(el) el.href = LINK_ASK_FINAL; });
-
-    const fbBtn = document.getElementById("fbBtn");
-    const igBtn = document.getElementById("igBtn");
-    if(fbBtn) fbBtn.href = CONTENT.facebookUrl;
-    if(igBtn) igBtn.href = CONTENT.instagramUrl;
-
-    const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CONTENT.mapQuery)}`;
-    const mapBtn = document.getElementById("mapBtn");
-    if(mapBtn) mapBtn.href = map;
-
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener("click", (e)=>{
-        const href = a.getAttribute("href");
-        if(href && href.length>1){
-          const target = document.querySelector(href);
-          if(target){
-            e.preventDefault();
-            target.scrollIntoView({behavior:"smooth", block:"start"});
-          }
-        }
-      });
-    });
-
-    const chipsWrap = document.getElementById("skinChips");
-    const metricImg = document.getElementById("metricImg");
-    const metricTitle = document.getElementById("currentMetricTitle");
-    const metricHint = document.getElementById("currentMetricHint");
-    const knowledgeTitle = document.getElementById("knowledgeTitle");
-    const knowledgeText = document.getElementById("knowledgeText");
-
-    function metricImagePath(key){
-      return `images/${key}.jpg`;
-    }
-
-    function setMetric(key){
-      metricTitle.textContent = key;
-      metricHint.textContent = "（真人測試圖）";
-      metricImg.src = metricImagePath(key);
-      metricImg.alt = `${key} 真人測試圖`;
-
-      knowledgeTitle.textContent = `肌膚小知識｜${key}`;
-      knowledgeText.textContent = CONTENT.knowledge[key] || "";
-
-      document.querySelectorAll(".chip[data-key]").forEach(btn=>{
-        btn.classList.toggle("active", btn.dataset.key === key);
-      });
-    }
-
-    CONTENT.skinItems.forEach((item)=>{
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "chip";
-      btn.dataset.key = item.key;
-      btn.innerHTML = `<i></i>${item.label}`;
-      btn.addEventListener("click", ()=> setMetric(item.key));
-      chipsWrap.appendChild(btn);
-    });
-
-    setMetric(CONTENT.skinItems[0].key);
-
-    function setFallback(imgEl, label){
-      imgEl.onerror = () => {
-        imgEl.removeAttribute("src");
-        imgEl.alt = `${label}（尚未放入圖片）`;
-        imgEl.style.background = "rgba(255,255,255,.55)";
-        imgEl.style.display = "block";
+      const handleSubmit = () => {
+        setIsSubmitting(true);
       };
-    }
-    setFallback(metricImg, "此項目");
-    setFallback(document.getElementById("storeImg"), "店內照片");
-    setFallback(document.getElementById("serviceImg"), "設備照片");
-    setFallback(document.getElementById("ownerImg"), "主理人照片");
-    setFallback(document.getElementById("deviceImg"), "服務情境照片");
-    setFallback(document.getElementById("logoImg"), "Logo");
 
-    /* ai-service 自動判斷直式/橫式 */
-    const deviceImg = document.getElementById("deviceImg");
-    const deviceImgBox = document.getElementById("deviceImgBox");
-
-    function applyServiceImageRatio(){
-      if (!deviceImg || !deviceImg.naturalWidth || !deviceImg.naturalHeight) return;
-      const isPortrait = deviceImg.naturalHeight > deviceImg.naturalWidth;
-
-      deviceImgBox.classList.remove("service-portrait", "service-landscape");
-      if (isPortrait) {
-        deviceImgBox.classList.add("service-portrait");
-      } else {
-        deviceImgBox.classList.add("service-landscape");
+      if (isSubmitted) {
+        return (
+          <div className="min-h-screen flex items-center justify-center p-4 fade-in">
+            <div className="bg-white max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border border-brand-100 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 to-brand-500"></div>
+              <div className="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-DEFAULT">
+                <i className="ph-fill ph-check-circle text-5xl"></i>
+              </div>
+              <h2 className="text-2xl font-bold text-brand-dark mb-4">諮詢單已成功送出！</h2>
+              <p className="text-gray-600 mb-8 leading-relaxed text-lg font-medium">
+                我們已收到您的諮詢！<br/>專屬肌膚管理師將為您進行深度分析，<br/>並於評估後盡快提供您的『客製化膚質報告』。
+              </p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="w-full bg-brand-100 text-brand-800 font-bold py-3 px-6 rounded-xl hover:bg-brand-200 transition-colors"
+              >
+                返回重新填寫
+              </button>
+            </div>
+          </div>
+        );
       }
-    }
 
-    deviceImg.addEventListener("load", applyServiceImageRatio);
+      return (
+        <div className="max-w-2xl mx-auto py-10 px-4 md:px-6 fade-in">
+          
+          <div className="text-center mb-10">
+            <img 
+              src="https://drive.google.com/thumbnail?id=1BEFOvnXFGPiQjtvYrZ8AMmk1f-FzVfFG&sz=w500" 
+              alt="泡泡臉 Logo" 
+              className="w-28 h-28 object-contain mx-auto mb-4 rounded-[2rem] shadow-sm border border-brand-100 bg-white p-2"
+              onError={(e) => {
+                e.target.onerror = null; 
+                e.target.src = 'https://placehold.co/150x150/f9f6fc/9A82AA?text=Logo';
+              }}
+            />
+            <h1 className="text-3xl font-bold text-brand-dark mb-3 tracking-tight">膚質診斷諮詢單</h1>
+            <h2 className="text-lg text-brand-600 font-medium mb-4">泡泡臉八德館</h2>
+            <p className="text-gray-500 bg-white inline-block px-6 py-2 rounded-full shadow-sm text-sm border border-brand-50">
+              請依照您目前的真實肌膚狀況進行勾選，<br className="sm:hidden" />完成後我們將為您分析專屬膚質類型。
+            </p>
+          </div>
+
+          <iframe 
+            name="hidden_iframe" 
+            id="hidden_iframe" 
+            style={{ display: 'none' }}
+            onLoad={() => {
+              if (isSubmitting) {
+                setIsSubmitting(false);
+                setIsSubmitted(true);
+                window.scrollTo(0, 0);
+              }
+            }}
+          ></iframe>
+
+          <form action={FORM_ACTION} method="POST" target="hidden_iframe" onSubmit={handleSubmit}>
+            
+            <Card className="border-t-4 border-t-brand-DEFAULT">
+              <h2 className="text-xl font-bold text-brand-dark mb-6 pb-4 border-b border-gray-100 flex items-center">
+                <i className="ph-fill ph-user-circle text-brand-400 mr-2 text-2xl"></i>
+                第一部分：基本資料
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <TextInput label="姓名" name={FIELDS.name} required placeholder="請輸入姓名" />
+                
+                <div className="mb-6">
+                  <label className="block text-brand-dark font-medium mb-2 flex items-center">
+                    性別 <span className="text-red-400 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <select name={FIELDS.gender} required className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent transition-all duration-200 appearance-none">
+                      <option value="" disabled selected>請選擇性別</option>
+                      <option value="女">女</option>
+                      <option value="男">男</option>
+                      <option value="其他">其他</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-brand-DEFAULT">
+                      <i className="ph-bold ph-caret-down"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <TextInput label="年齡" name={FIELDS.age} type="number" required placeholder="例如：25" />
+                <TextInput label="工作性質" name={FIELDS.job} required placeholder="例如：上班族、戶外業務..." />
+              </div>
+            </Card>
+
+            <div className="flex items-center my-8 text-brand-300">
+              <div className="flex-grow border-t border-brand-200"></div>
+              <span className="mx-4 text-sm font-medium">接下來請選擇最符合您的狀況</span>
+              <div className="flex-grow border-t border-brand-200"></div>
+            </div>
+
+            <div className="mb-4 pl-2">
+              <h2 className="text-xl font-bold text-brand-dark flex items-center">
+                <i className="ph-fill ph-magnifying-glass text-brand-400 mr-2 text-2xl"></i>
+                第二部分：膚質判斷指標
+              </h2>
+            </div>
+
+            <RadioGroup title={QUESTIONS_TITLES.q1} name={FIELDS.q1} options={RADIO_OPTIONS.q1} />
+            <RadioGroup title={QUESTIONS_TITLES.q2} name={FIELDS.q2} options={RADIO_OPTIONS.q2} />
+            <RadioGroup title={QUESTIONS_TITLES.q3} name={FIELDS.q3} options={RADIO_OPTIONS.q3} />
+            <RadioGroup title={QUESTIONS_TITLES.q4} name={FIELDS.q4} options={RADIO_OPTIONS.q4} />
+            <RadioGroup title={QUESTIONS_TITLES.q5} name={FIELDS.q5} options={RADIO_OPTIONS.q5} />
+            <RadioGroup title={QUESTIONS_TITLES.q6} name={FIELDS.q6} options={RADIO_OPTIONS.q6} />
+            <RadioGroup title={QUESTIONS_TITLES.q7} name={FIELDS.q7} options={RADIO_OPTIONS.q7} />
+            <RadioGroup title={QUESTIONS_TITLES.q8} name={FIELDS.q8} options={RADIO_OPTIONS.q8} />
+            <RadioGroup title={QUESTIONS_TITLES.q9} name={FIELDS.q9} options={RADIO_OPTIONS.q9} />
+
+            <div className="mt-10 mb-20 text-center">
+              <button 
+                type="submit"
+                disabled={isSubmitting}
+                className={`
+                  relative inline-flex items-center justify-center px-12 py-4 text-lg font-bold text-white rounded-full
+                  bg-gradient-to-r from-brand-400 to-brand-600 shadow-[0_10px_25px_-5px_rgba(154,130,170,0.5)]
+                  hover:shadow-[0_15px_35px_-5px_rgba(154,130,170,0.6)] hover:-translate-y-1
+                  transition-all duration-300 w-full sm:w-auto overflow-hidden
+                  ${isSubmitting ? 'opacity-80 cursor-wait' : ''}
+                `}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <i className="ph ph-spinner animate-spin mr-2 text-xl"></i>
+                    傳送中...
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    送出診斷諮詢單
+                    <i className="ph-bold ph-paper-plane-right ml-2"></i>
+                  </span>
+                )}
+              </button>
+              <p className="mt-4 text-sm text-brand-400">
+                <i className="ph-fill ph-lock-key mr-1"></i>
+                您的資料僅供肌膚分析使用，絕對保密。
+              </p>
+            </div>
+          </form>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
   </script>
 
+  <style>
+    input[type="radio"]:checked + label .after-element {
+      transform: scale(1);
+    }
+  </style>
 </body>
 </html>
